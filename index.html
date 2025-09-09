@@ -1,0 +1,227 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Surpresa — Clique</title>
+  <style>
+    :root{
+      --red:#e33;
+      --bg:#0f1724;
+      --card-bg: #fff;
+    }
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+    body{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: linear-gradient(180deg,#071126 0%, #0d2a40 100%);
+      color:#fff;
+      padding:24px;
+    }
+
+    .container{
+      text-align:center;
+      max-width:680px;
+      width:100%;
+      background:rgba(255,255,255,0.03);
+      padding:28px;
+      border-radius:16px;
+      box-shadow: 0 6px 30px rgba(2,6,23,0.6);
+      backdrop-filter: blur(4px);
+    }
+
+    h1{margin:0 0 12px;font-size:22px}
+    p.lead{margin:0 0 22px;color:rgba(255,255,255,0.85)}
+
+    .btn{
+      display:inline-block;
+      background:var(--red);
+      color:#fff;
+      border:0;
+      padding:14px 22px;
+      font-size:16px;
+      border-radius:10px;
+      cursor:pointer;
+      box-shadow: 0 6px 14px rgba(227,51,51,0.28);
+      transition:transform .12s ease, box-shadow .12s ease;
+    }
+    .btn:active{transform:translateY(2px);box-shadow:0 3px 8px rgba(0,0,0,0.25)}
+    .btn:focus{outline:3px solid rgba(255,255,255,0.12)}
+
+    /* Modal */
+    .modal-backdrop{
+      position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+      background:linear-gradient(180deg, rgba(2,6,23,0.6), rgba(2,6,23,0.9));
+      z-index:60;
+      padding:24px;
+    }
+    .card{
+      background:var(--card-bg);
+      color:#0b1220;
+      padding:20px;
+      border-radius:12px;
+      max-width:560px;
+      width:100%;
+      box-shadow: 0 10px 40px rgba(2,6,23,0.6);
+      text-align:left;
+    }
+    .card h2{margin:0 0 6px;font-size:20px}
+    .card p{margin:8px 0 12px;line-height:1.45}
+    .card .actions{display:flex;gap:10px;justify-content:flex-end}
+    .link-insta{
+      display:inline-block;padding:10px 14px;border-radius:8px;text-decoration:none;
+      background:linear-gradient(90deg,#405de6,#833ab4,#fd1d1d);
+      color:white;font-weight:600;
+    }
+    .close-btn{
+      background:transparent;border:0;color:#555;font-weight:700;padding:8px 10px;border-radius:8px;cursor:pointer;
+    }
+    /* Confetti canvas sits on top */
+    canvas#confetti{
+      position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:100;
+      display:none;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="confetti" aria-hidden="true"></canvas>
+
+  <div class="container" role="main">
+    <h1>Pronto pra surpresa?</h1>
+    <p class="lead">Clique no botão — eu preparei uma mensagem especial pra compartilhar.</p>
+    <button class="btn" id="magicBtn" aria-haspopup="dialog" aria-controls="messageModal">
+      Clique aqui
+    </button>
+  </div>
+
+  <div class="modal-backdrop" id="messageModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="card" role="document">
+      <h2 id="modalTitle">Uma coisa que eu queria dizer...</h2>
+      <p id="modalMessage">
+        Cara, eu fiz isso aqui pra te falar que acho que gosto de você — não sei ao certo ainda. Fiquei meio estranho antes porque falei que você era bonita, entendeu?
+        Se você quiser tentar algo, me manda lá no Insta: <strong>@guzxtts</strong>
+      </p>
+      <div class="actions">
+        <a id="openInsta" class="link-insta" href="https://instagram.com/guzxtts" target="_blank" rel="noopener">@guzxtts</a>
+        <button class="close-btn" id="closeModal">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Áudio embutido em base64 -->
+  <audio id="popSound">
+    <source src="data:audio/mp3;base64,//uQxAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCAAwACABAAZGF0Yf//AAAA" type="audio/mp3">
+  </audio>
+
+  <script>
+  // ---------- Confetti ----------
+  (function(){
+    const canvas = document.getElementById('confetti');
+    const ctx = canvas.getContext('2d');
+    let W = canvas.width = innerWidth;
+    let H = canvas.height = innerHeight;
+    let particles = [];
+    const colors = ["#ff3b3b","#ffd166","#4ADE80","#60A5FA","#C084FC","#FB7185"];
+    const gravity = 0.35;
+
+    function rand(min,max){ return Math.random()*(max-min)+min }
+
+    function Particle(x,y){
+      this.x = x;
+      this.y = y;
+      this.size = rand(6,11);
+      this.color = colors[(Math.random()*colors.length)|0];
+      this.rotation = rand(0,2*Math.PI);
+      this.speedX = rand(-6,6);
+      this.speedY = rand(-10,-4);
+      this.spin = rand(-0.2,0.2);
+      this.opacity = 1;
+      this.life = 0;
+      this.ttl = rand(60,120);
+    }
+    Particle.prototype.update = function(){
+      this.speedY += gravity * 0.15;
+      this.x += this.speedX;
+      this.y += this.speedY;
+      this.rotation += this.spin;
+      this.life++;
+      if(this.life > this.ttl) this.opacity -= 0.06;
+    }
+    Particle.prototype.draw = function(ctx){
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, this.opacity);
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.rotation);
+      ctx.fillStyle = this.color;
+      ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size*0.6);
+      ctx.restore();
+    }
+
+    function spawn(x,y,count){
+      for(let i=0;i<count;i++) particles.push(new Particle(x + rand(-20,20), y + rand(-10,10)));
+    }
+
+    let animId = null;
+    function animate(){
+      ctx.clearRect(0,0,W,H);
+      for(let i=particles.length-1;i>=0;i--){
+        const p = particles[i];
+        p.update();
+        p.draw(ctx);
+        if(p.opacity <= 0 || p.y > H + 50 || p.x < -50 || p.x > W + 50) particles.splice(i,1);
+      }
+      if(particles.length>0) animId = requestAnimationFrame(animate);
+      else {
+        cancelAnimationFrame(animId);
+        canvas.style.display = 'none';
+      }
+    }
+
+    window.addEventListener('resize', () => {
+      W = canvas.width = innerWidth;
+      H = canvas.height = innerHeight;
+    });
+
+    window.confettiBurst = function(x = W/2, y = H/3, bursts = 120){
+      canvas.style.display = 'block';
+      spawn(x,y,bursts);
+      if(!animId) animate();
+    }
+  })();
+
+  // ---------- Modal & button logic ----------
+  const btn = document.getElementById('magicBtn');
+  const modal = document.getElementById('messageModal');
+  const closeBtn = document.getElementById('closeModal');
+  const popSound = document.getElementById('popSound');
+
+  function openModal(){
+    const rect = btn.getBoundingClientRect();
+    const x = rect.left + rect.width/2;
+    const y = rect.top + rect.height/2;
+    window.confettiBurst(x, y, 160);
+
+    // toca som
+    popSound.currentTime = 0;
+    popSound.play();
+
+    setTimeout(() => {
+      modal.style.display = 'flex';
+      closeBtn.focus();
+    }, 350);
+  }
+
+  function closeModal(){
+    modal.style.display = 'none';
+  }
+
+  btn.addEventListener('click', openModal);
+  closeBtn.addEventListener('click', closeModal);
+
+  window.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape') closeModal();
+  });
+  </script>
+</body>
+</html>
