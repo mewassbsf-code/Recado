@@ -1,0 +1,85 @@
+<!DOCTYPE html><html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Uma Surpresa 💜</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+    }body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+}
+
+.box {
+  width: 320px;
+  padding: 30px;
+  background: #fff;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  transition: all 0.6s ease;
+}
+
+.box.closed .letter {
+  display: none;
+}
+
+.box.opened {
+  width: 380px;
+}
+
+button {
+  margin-top: 20px;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 30px;
+  background: #6a11cb;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background: #4e0fb8;
+}
+
+.letter {
+  margin-top: 20px;
+  text-align: left;
+  color: #333;
+  animation: fadeIn 1s ease;
+}
+
+.letter p {
+  line-height: 1.6;
+  font-size: 15px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+  </style>
+</head>
+<body>  <div class="box closed" id="box">
+    <h2>💌 Uma cartinha pra você</h2>
+    <button onclick="openBox()">Abrir</button><div class="letter">
+  <p>oii, sou eu Gusttavo, como você tá ? Deve tá chegando de Formoso agora 🤡 acabei de falar com vc que ia fazer a surpresa, eu venho nesta carta dizer que eu te amo muito mesmo, de verdade vc é a pessoa mais incrível que eu já conheci, com vc foi diferente, vc tá sendo a menina que estou botando Deus no meio, alguém que tô levando a sério e que quero realmente pro resto da minha vida não é só uma conversinha que vai durar 5 meses e acabar eu te prometo isso, eu penso em vc todo momento quando vc viaja e não consigo falar com vc, isso me faz refletir muito o quanto eu te amo kkk vc some do nada e eu não consigo falar com vc mais mesmo assim eu fico insistindo em ver suas fotos, vídeos e nossas conversas, espero que vc tenha gostado do que eu fiz e te dizer...</p>
+  <p><strong>Eu te amo e não quero te perder nunca 💜💛🥹</strong></p>
+</div>
+
+  </div>  <script>
+    function openBox() {
+      const box = document.getElementById('box');
+      box.classList.remove('closed');
+      box.classList.add('opened');
+    }
+  </script></body>
+</html>
